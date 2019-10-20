@@ -38,14 +38,20 @@ class NiftiWidget:
         if hasattr(filename, "get_data"):
             self.data = filename
         else:
-            filename = str(filename)
-            if not os.path.isfile(filename):
-                raise OSError("File " + filename + " not found.")
+            # allows to send in data as a ndarray itself instead of just .nii
+            # file. Works on the assumption that the ndarray will be the same
+            # format as the data would have been when extracted using nib
+            if isinstance(filename, np.ndarray):
+                self.data = filename
+            else:
+                filename = str(filename)
+                if not os.path.isfile(filename):
+                    raise OSError("File " + filename + " not found.")
 
-            # load data in advance
-            # this ensures once the widget is created that the file is of a
-            # format readable by nibabel
-            self.data = nib.load(str(filename))
+                # load data in advance
+                # this ensures once the widget is created that the file is of a
+                # format readable by nibabel
+                self.data = nib.load(str(filename))
 
         # initialise where the image handles will go
         self.image_handles = None
